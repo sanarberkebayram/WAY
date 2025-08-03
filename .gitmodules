@@ -1,0 +1,6 @@
+[submodule "extern/jwt-cpp"]
+	path = extern/jwt-cpp
+	url = https://github.com/Thalhammer/jwt-cpp.git
+[submodule "extern/cpp-httplib"]
+	path = extern/cpp-httplib
+	url = https://github.com/yhirose/cpp-httplib.git
