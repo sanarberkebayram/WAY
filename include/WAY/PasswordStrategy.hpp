@@ -2,6 +2,7 @@
 
 #include "WAY/AuthenticationStrategy.hpp"
 #include "WAY/IDatabase.hpp"
+#include <string>
 
 namespace WAY {
     class PasswordStrategy : public IAuthenticationStrategy {

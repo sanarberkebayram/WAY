@@ -1,5 +1,6 @@
 #include "WAY/server.hpp"
 #include "WAY/DatabaseFactory.hpp"
+#include "WAY/InMemorySessionManager.hpp"
 #include <iostream>
 #include <map>
 
@@ -8,7 +9,9 @@ int main() {
     db_config["path"] = "way.db";
     auto db = WAY::DatabaseFactory::createDatabase("sqlite", db_config);
 
-    WAY::Server server(std::move(db));
+    auto session_manager = std::make_unique<WAY::InMemorySessionManager>();
+
+    WAY::Server server(std::move(db), std::move(session_manager));
     std::cout << "Starting WAY server on port 8080..." << std::endl;
     try {
         server.start(8080);

@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 project(WAY)
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -14,7 +12,12 @@ include_directories(include extern/cpp-httplib extern/sqlite_orm/include)
 add_executable(way_server src/main.cpp)
 
 # Add library for the framework
-add_library(way_framework src/server.cpp src/PasswordStrategy.cpp src/JwtStrategy.cpp src/GoogleOAuth2Strategy.cpp src/AuthenticationService.cpp src/SQLiteDatabase.cpp src/DatabaseFactory.cpp)
+add_library(way_framework src/server.cpp src/PasswordStrategy.cpp src/JwtStrategy.cpp src/GoogleOAuth2Strategy.cpp src/AuthenticationService.cpp src/SQLiteDatabase.cpp src/DatabaseFactory.cpp src/InMemorySessionManager.cpp)
+
+add_subdirectory(extern/libbcrypt)
+
+target_link_libraries(way_framework PRIVATE jwt-cpp::jwt-cpp sqlite3 bcrypt)
+target_include_directories(way_framework PRIVATE extern/libbcrypt/include)
 
 # Add jwt-cpp library
 add_subdirectory(extern/jwt-cpp)
@@ -33,6 +36,7 @@ add_executable(way_tests tests/test_framework.cpp)
 
 # Link test executable to the framework
 target_link_libraries(way_tests way_framework)
+target_include_directories(way_tests PRIVATE extern/libbcrypt/include)
 
 # Add test to CTest
 add_test(NAME framework_tests COMMAND way_tests)

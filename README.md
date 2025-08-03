@@ -129,10 +129,10 @@ Here are some of the features and improvements planned for the future of WAY:
 
 -   **Database Integration:**
     -   [ ] **User Storage:** Implement database connectors (e.g., SQLite) to store and manage user credentials securely, replacing the current in-memory user list. (Note: PostgreSQL, MySQL, and MongoDB integration will likely require a C++ package manager like vcpkg or Conan for dependency management.)
-    -   [ ] **Session Management:** Introduce session management capabilities with support for backend stores like Redis to manage user sessions effectively.
+    -   [x] **Session Management:** Implemented a basic in-memory session manager. Future plans include integrating with external stores like Redis.
 
 -   **Enhanced Security:**
-    -   [ ] **Password Hashing:** Integrate a robust password hashing library (e.g., Argon2, bcrypt) to securely store user passwords.
+    -   [x] **Password Hashing:** Integrated `libbcrypt` for secure password storage and verification.
     -   [ ] **Rate Limiting:** Implement rate limiting to protect against brute-force attacks.
 
 -   **Improved Developer Experience:**
