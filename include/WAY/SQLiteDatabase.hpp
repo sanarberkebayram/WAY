@@ -14,7 +14,8 @@ namespace WAY {
             sqlite_orm::make_table("users",
                 sqlite_orm::make_column("id", &User::id, sqlite_orm::primary_key().autoincrement()),
                 sqlite_orm::make_column("username", &User::username),
-                sqlite_orm::make_column("password_hash", &User::password_hash)
+                sqlite_orm::make_column("password_hash", &User::password_hash),
+                sqlite_orm::make_column("google_id", &User::google_id)
             )
         );
     }
@@ -24,6 +25,7 @@ namespace WAY {
         explicit SQLiteDatabase(const std::string& path);
         
         std::optional<User> getUserByUsername(const std::string& username) override;
+        std::optional<User> getUserByGoogleId(const std::string& google_id) override;
         void addUser(const User& user) override;
 
     private:

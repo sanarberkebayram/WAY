@@ -14,7 +14,7 @@ namespace WAY {
         auth_service.addStrategy("jwt", std::make_unique<JwtStrategy>("secret"));
 
         // Add Google OAuth2 Strategy
-        auth_service.addStrategy("google", std::make_unique<GoogleOAuth2Strategy>("YOUR_CLIENT_ID", "YOUR_CLIENT_SECRET", "YOUR_REDIRECT_URI"));
+        auth_service.addStrategy("google", std::make_unique<GoogleOAuth2Strategy>("YOUR_CLIENT_ID", "YOUR_CLIENT_SECRET", "YOUR_REDIRECT_URI", *db));
 
         http_server.Post("/authenticate", [this](const httplib::Request& req, httplib::Response& res) {
             std::string client_ip = req.remote_addr;

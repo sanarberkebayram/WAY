@@ -3,8 +3,8 @@
 #include "nlohmann/json.hpp"
 
 namespace WAY {
-    GoogleOAuth2Strategy::GoogleOAuth2Strategy(const std::string& client_id, const std::string& client_secret, const std::string& redirect_uri)
-        : client_id(client_id), client_secret(client_secret), redirect_uri(redirect_uri) {}
+    GoogleOAuth2Strategy::GoogleOAuth2Strategy(const std::string& client_id, const std::string& client_secret, const std::string& redirect_uri, IDatabase& db)
+        : client_id(client_id), client_secret(client_secret), redirect_uri(redirect_uri), db(db) {}
 
     bool GoogleOAuth2Strategy::authenticate(const std::map<std::string, std::string>& credentials) {
         auto code_it = credentials.find("code");
@@ -34,7 +34,18 @@ namespace WAY {
 
             auto user_info_res = user_info_cli.Get("/oauth2/v2/userinfo", headers);
 
-            return user_info_res && user_info_res->status == 200;
+            if (user_info_res && user_info_res->status == 200) {
+                nlohmann::json user_info = nlohmann::json::parse(user_info_res->body);
+                std::string google_id = user_info["id"];
+                std::string email = user_info["email"];
+
+                auto user = db.getUserByGoogleId(google_id);
+                if (!user) {
+                    // User does not exist, create a new one
+                    db.addUser(User{0, email, "", google_id}); // No password for Google auth
+                }
+                return true;
+            }
         }
 
         return false;

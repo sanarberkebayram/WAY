@@ -34,10 +34,10 @@ int main() {
     auth_service.addStrategy("jwt", std::make_unique<WAY::JwtStrategy>("secret"));
 
     // Add Google OAuth2 Strategy
-    auth_service.addStrategy("google", std::make_unique<WAY::GoogleOAuth2Strategy>("test_client_id", "test_client_secret", "test_redirect_uri"));
+    auth_service.addStrategy("google", std::make_unique<WAY::GoogleOAuth2Strategy>("test_client_id", "test_client_secret", "test_redirect_uri", *db));
 
     // Add a user to the database with plain password (temporarily)
-    WAY::User user{0, "testuser", "password123"};
+    WAY::User user{0, "testuser", "password123", std::nullopt};
     db->addUser(user);
 
     // Test Password Strategy
@@ -65,7 +65,7 @@ int main() {
     assert(!session_manager->getSession(session_id).has_value());
 
     // Test Google OAuth2 Strategy (URL generation)
-    WAY::GoogleOAuth2Strategy google_strategy("test_client_id", "test_client_secret", "test_redirect_uri");
+    WAY::GoogleOAuth2Strategy google_strategy("test_client_id", "test_client_secret", "test_redirect_uri", *db);
     std::string auth_url = google_strategy.getAuthorizationUrl();
     assert(auth_url.find("test_client_id") != std::string::npos);
 
