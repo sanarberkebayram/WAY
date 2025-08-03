@@ -1,5 +1,4 @@
 #include "WAY/PasswordStrategy.hpp"
-#include "bcrypt/BCrypt.hpp"
 
 namespace WAY {
     PasswordStrategy::PasswordStrategy(IDatabase& db) : db(db) {}
@@ -16,8 +15,8 @@ namespace WAY {
         const std::string& password = password_it->second;
 
         auto user = db.getUserByUsername(username);
-        if (user) {
-            return BCrypt::validatePassword(password, user->password_hash);
+        if (user && user->password_hash == password) {
+            return true;
         }
 
         return false;

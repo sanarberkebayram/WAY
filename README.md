@@ -69,11 +69,16 @@ The framework is composed of three main components:
 
 ### Running the Server
 
-The server will start on port 8080. You can use `curl` to send authentication requests.
+The server can be started using the CLI. It will start on port 8080 by default, but you can configure it using command-line arguments or environment variables.
 
 ```bash
-./way_server
+./way_cli --port 8080 --db-type sqlite --db-path way.db
+# Or using environment variables
+WAY_PORT=8080 WAY_DB_TYPE=sqlite WAY_DB_PATH=way.db ./way_cli
 ```
+
+You can use `curl` to send authentication requests.
+
 
 ### Running the Tests
 
@@ -132,11 +137,11 @@ Here are some of the features and improvements planned for the future of WAY:
     -   [x] **Session Management:** Implemented a basic in-memory session manager. Future plans include integrating with external stores like Redis.
 
 -   **Enhanced Security:**
-    -   [x] **Password Hashing:** Integrated `libbcrypt` for secure password storage and verification.
-    -   [ ] **Rate Limiting:** Implement rate limiting to protect against brute-force attacks.
+    -   [ ] **Password Hashing:** Integrate a robust password hashing library (e.g., Argon2, bcrypt) to securely store user passwords.
+    -   [x] **Rate Limiting:** Implemented rate limiting to protect against brute-force attacks.
 
 -   **Improved Developer Experience:**
-    -   [ ] **Command-Line Interface (CLI):** Develop a CLI tool to manage the server, including starting/stopping the server and managing configuration through environment variables.
+    -   [x] **Command-Line Interface (CLI):** Developed a CLI tool to manage the server, including starting/stopping the server and managing configuration through environment variables.
     -   [ ] **Configuration Management:** Implement a more robust configuration system to manage secrets and other settings.
 
 -   **Expanded Authentication Strategies:**

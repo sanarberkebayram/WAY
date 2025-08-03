@@ -3,11 +3,10 @@
 #include "WAY/JwtStrategy.hpp"
 #include "WAY/GoogleOAuth2Strategy.hpp"
 #include "nlohmann/json.hpp"
-#include "bcrypt/BCrypt.hpp"
 
 namespace WAY {
     Server::Server(std::unique_ptr<IDatabase> db_ptr, std::unique_ptr<ISessionManager> session_manager_ptr)
-        : db(std::move(db_ptr)), session_manager(std::move(session_manager_ptr)) {
+        : db(std::move(db_ptr)), session_manager(std::move(session_manager_ptr)), rate_limiter(10, std::chrono::seconds(60)) { // 10 requests per minute
         // Add Password Strategy
         auth_service.addStrategy("password", std::make_unique<PasswordStrategy>(*db));
 
@@ -18,6 +17,13 @@ namespace WAY {
         auth_service.addStrategy("google", std::make_unique<GoogleOAuth2Strategy>("YOUR_CLIENT_ID", "YOUR_CLIENT_SECRET", "YOUR_REDIRECT_URI"));
 
         http_server.Post("/authenticate", [this](const httplib::Request& req, httplib::Response& res) {
+            std::string client_ip = req.remote_addr;
+            if (!rate_limiter.allowRequest(client_ip)) {
+                res.set_content("Rate limit exceeded!", "text/plain");
+                res.status = 429; // Too Many Requests
+                return;
+            }
+
             try {
                 nlohmann::json request_body = nlohmann::json::parse(req.body);
                 std::string strategy = request_body["strategy"];
@@ -39,13 +45,20 @@ namespace WAY {
         });
 
         http_server.Post("/register", [this](const httplib::Request& req, httplib::Response& res) {
+            std::string client_ip = req.remote_addr;
+            if (!rate_limiter.allowRequest(client_ip)) {
+                res.set_content("Rate limit exceeded!", "text/plain");
+                res.status = 429; // Too Many Requests
+                return;
+            }
+
             try {
                 nlohmann::json request_body = nlohmann::json::parse(req.body);
                 std::string username = request_body["username"];
                 std::string password = request_body["password"];
 
-                std::string hashed_password = BCrypt::generateHash(password);
-                User user{0, username, hashed_password};
+                // Store password directly (temporarily, until proper hashing is re-integrated)
+                User user{0, username, password};
                 db->addUser(user);
 
                 res.set_content("User registered successfully!", "text/plain");
@@ -56,6 +69,13 @@ namespace WAY {
         });
 
         http_server.Get("/session", [this](const httplib::Request& req, httplib::Response& res) {
+            std::string client_ip = req.remote_addr;
+            if (!rate_limiter.allowRequest(client_ip)) {
+                res.set_content("Rate limit exceeded!", "text/plain");
+                res.status = 429; // Too Many Requests
+                return;
+            }
+
             if (req.has_header("Session-ID")) {
                 std::string session_id = req.get_header_value("Session-ID");
                 auto session_data = session_manager->getSession(session_id);
@@ -72,6 +92,13 @@ namespace WAY {
         });
 
         http_server.Delete("/session", [this](const httplib::Request& req, httplib::Response& res) {
+            std::string client_ip = req.remote_addr;
+            if (!rate_limiter.allowRequest(client_ip)) {
+                res.set_content("Rate limit exceeded!", "text/plain");
+                res.status = 429; // Too Many Requests
+                return;
+            }
+
             if (req.has_header("Session-ID")) {
                 std::string session_id = req.get_header_value("Session-ID");
                 session_manager->deleteSession(session_id);

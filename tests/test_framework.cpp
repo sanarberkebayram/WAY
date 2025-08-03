@@ -5,13 +5,15 @@
 #include "WAY/SQLiteDatabase.hpp"
 #include "WAY/DatabaseFactory.hpp"
 #include "WAY/InMemorySessionManager.hpp"
+#include "WAY/RateLimiter.hpp"
 #include "WAY/User.hpp"
-#include "bcrypt/BCrypt.hpp"
 #include <cassert>
 #include <vector>
 #include <map>
 #include <iostream>
 #include <fstream>
+#include <chrono>
+#include <thread>
 
 int main() {
     // Clean up previous test database
@@ -34,9 +36,8 @@ int main() {
     // Add Google OAuth2 Strategy
     auth_service.addStrategy("google", std::make_unique<WAY::GoogleOAuth2Strategy>("test_client_id", "test_client_secret", "test_redirect_uri"));
 
-    // Add a user to the database with hashed password
-    std::string hashed_password = BCrypt::generateHash("password123");
-    WAY::User user{0, "testuser", hashed_password};
+    // Add a user to the database with plain password (temporarily)
+    WAY::User user{0, "testuser", "password123"};
     db->addUser(user);
 
     // Test Password Strategy
@@ -67,6 +68,15 @@ int main() {
     WAY::GoogleOAuth2Strategy google_strategy("test_client_id", "test_client_secret", "test_redirect_uri");
     std::string auth_url = google_strategy.getAuthorizationUrl();
     assert(auth_url.find("test_client_id") != std::string::npos);
+
+    // Test Rate Limiter
+    WAY::RateLimiter rate_limiter(2, std::chrono::seconds(1)); // 2 requests per second
+    std::string test_ip = "127.0.0.1";
+    assert(rate_limiter.allowRequest(test_ip));
+    assert(rate_limiter.allowRequest(test_ip));
+    assert(!rate_limiter.allowRequest(test_ip)); // Should be rate limited
+    std::this_thread::sleep_for(std::chrono::seconds(1)); // Wait for window to pass
+    assert(rate_limiter.allowRequest(test_ip)); // Should be allowed again
 
     std::cout << "All tests passed!" << std::endl;
 

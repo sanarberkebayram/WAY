@@ -10,6 +10,3 @@
 [submodule "extern/libpqxx"]
 	path = extern/libpqxx
 	url = https://github.com/jtv/libpqxx.git
-[submodule "extern/libbcrypt"]
-	path = extern/libbcrypt
-	url = https://github.com/trusch/libbcrypt.git

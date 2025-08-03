@@ -3,6 +3,7 @@
 #include "WAY/AuthenticationService.hpp"
 #include "WAY/IDatabase.hpp"
 #include "WAY/ISessionManager.hpp"
+#include "WAY/RateLimiter.hpp"
 #include "httplib.h"
 #include <memory>
 
@@ -17,5 +18,6 @@ namespace WAY {
         AuthenticationService auth_service;
         std::unique_ptr<IDatabase> db;
         std::unique_ptr<ISessionManager> session_manager;
+        RateLimiter rate_limiter;
     };
 }
