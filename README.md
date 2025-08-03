@@ -128,7 +128,7 @@ curl -X POST -H "Content-Type: application/json" -d "{
 Here are some of the features and improvements planned for the future of WAY:
 
 -   **Database Integration:**
-    -   [ ] **User Storage:** Implement database connectors (e.g., PostgreSQL, MySQL, SQLite) to store and manage user credentials securely, replacing the current in-memory user list.
+    -   [ ] **User Storage:** Implement database connectors (e.g., SQLite) to store and manage user credentials securely, replacing the current in-memory user list. (Note: PostgreSQL, MySQL, and MongoDB integration will likely require a C++ package manager like vcpkg or Conan for dependency management.)
     -   [ ] **Session Management:** Introduce session management capabilities with support for backend stores like Redis to manage user sessions effectively.
 
 -   **Enhanced Security:**

@@ -1,25 +1,29 @@
 cmake_minimum_required(VERSION 3.10)
 project(WAY)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Include directories
-include_directories(include extern/cpp-httplib)
+include_directories(include extern/cpp-httplib extern/sqlite_orm/include)
 
 # Add executable
 add_executable(way_server src/main.cpp)
 
 # Add library for the framework
-add_library(way_framework src/server.cpp src/PasswordStrategy.cpp src/JwtStrategy.cpp src/GoogleOAuth2Strategy.cpp src/AuthenticationService.cpp)
+add_library(way_framework src/server.cpp src/PasswordStrategy.cpp src/JwtStrategy.cpp src/GoogleOAuth2Strategy.cpp src/AuthenticationService.cpp src/SQLiteDatabase.cpp src/DatabaseFactory.cpp)
 
 # Add jwt-cpp library
 add_subdirectory(extern/jwt-cpp)
-target_link_libraries(way_framework PRIVATE jwt-cpp::jwt-cpp)
 
 # Link library to the executable
 target_link_libraries(way_server way_framework)
+
+# Link framework to external libraries
+target_link_libraries(way_framework PRIVATE jwt-cpp::jwt-cpp sqlite3)
 
 # Add testing
 enable_testing()

@@ -2,24 +2,31 @@
 #include "WAY/PasswordStrategy.hpp"
 #include "WAY/JwtStrategy.hpp"
 #include "WAY/GoogleOAuth2Strategy.hpp"
+#include "WAY/SQLiteDatabase.hpp"
+#include "WAY/DatabaseFactory.hpp"
 #include "WAY/User.hpp"
 #include <cassert>
 #include <vector>
 #include <map>
 #include <iostream>
+#include <fstream>
 
 int main() {
+    // Clean up previous test database
+    std::remove("test.db");
+
+    std::map<std::string, std::string> db_config;
+    db_config["path"] = "test.db";
+    auto db = WAY::DatabaseFactory::createDatabase("sqlite", db_config);
+
     WAY::AuthenticationService auth_service;
 
     // Add Password Strategy
-    std::vector<WAY::User> users = {{"testuser", "password123"}};
-    auth_service.addStrategy("password", std::make_unique<WAY::PasswordStrategy>(users));
+    auth_service.addStrategy("password", std::make_unique<WAY::PasswordStrategy>(*db));
 
-    // Add JWT Strategy
-    auth_service.addStrategy("jwt", std::make_unique<WAY::JwtStrategy>("secret"));
-
-    // Add Google OAuth2 Strategy
-    auth_service.addStrategy("google", std::make_unique<WAY::GoogleOAuth2Strategy>("test_client_id", "test_client_secret", "test_redirect_uri"));
+    // Add a user to the database
+    WAY::User user{0, "testuser", "password123"};
+    db->addUser(user);
 
     // Test Password Strategy
     std::map<std::string, std::string> password_credentials = {{"username", "testuser"}, {"password", "password123"}};
@@ -29,6 +36,7 @@ int main() {
     WAY::JwtStrategy jwt_strategy("secret");
     std::string token = jwt_strategy.generateToken("testuser");
     std::map<std::string, std::string> jwt_credentials = {{"token", token}};
+    auth_service.addStrategy("jwt", std::make_unique<WAY::JwtStrategy>("secret"));
     assert(auth_service.authenticate("jwt", jwt_credentials));
 
     // Test Google OAuth2 Strategy (URL generation)

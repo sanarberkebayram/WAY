@@ -1,16 +1,15 @@
 #pragma once
 
 #include "WAY/AuthenticationStrategy.hpp"
-#include "WAY/User.hpp"
-#include <vector>
+#include "WAY/IDatabase.hpp"
 
 namespace WAY {
     class PasswordStrategy : public IAuthenticationStrategy {
     public:
-        explicit PasswordStrategy(const std::vector<User>& users);
+        explicit PasswordStrategy(IDatabase& db);
         bool authenticate(const std::map<std::string, std::string>& credentials) override;
 
     private:
-        const std::vector<User>& users;
+        IDatabase& db;
     };
 }

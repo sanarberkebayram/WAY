@@ -1,7 +1,7 @@
 #include "WAY/PasswordStrategy.hpp"
 
 namespace WAY {
-    PasswordStrategy::PasswordStrategy(const std::vector<User>& users) : users(users) {}
+    PasswordStrategy::PasswordStrategy(IDatabase& db) : db(db) {}
 
     bool PasswordStrategy::authenticate(const std::map<std::string, std::string>& credentials) {
         auto username_it = credentials.find("username");
@@ -14,10 +14,9 @@ namespace WAY {
         const std::string& username = username_it->second;
         const std::string& password = password_it->second;
 
-        for (const auto& user : users) {
-            if (user.username == username && user.password_hash == password) {
-                return true;
-            }
+        auto user = db.getUserByUsername(username);
+        if (user && user->password_hash == password) {
+            return true;
         }
 
         return false;

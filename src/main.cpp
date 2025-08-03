@@ -1,8 +1,14 @@
 #include "WAY/server.hpp"
+#include "WAY/DatabaseFactory.hpp"
 #include <iostream>
+#include <map>
 
 int main() {
-    WAY::Server server;
+    std::map<std::string, std::string> db_config;
+    db_config["path"] = "way.db";
+    auto db = WAY::DatabaseFactory::createDatabase("sqlite", db_config);
+
+    WAY::Server server(std::move(db));
     std::cout << "Starting WAY server on port 8080..." << std::endl;
     try {
         server.start(8080);

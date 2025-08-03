@@ -5,10 +5,9 @@
 #include "nlohmann/json.hpp"
 
 namespace WAY {
-    Server::Server() {
+    Server::Server(std::unique_ptr<IDatabase> db_ptr) : db(std::move(db_ptr)) {
         // Add Password Strategy
-        std::vector<User> users = {{"testuser", "password123"}};
-        auth_service.addStrategy("password", std::make_unique<PasswordStrategy>(users));
+        auth_service.addStrategy("password", std::make_unique<PasswordStrategy>(*db));
 
         // Add JWT Strategy
         auth_service.addStrategy("jwt", std::make_unique<JwtStrategy>("secret"));
@@ -28,6 +27,22 @@ namespace WAY {
                     res.set_content("Authentication failed!", "text/plain");
                     res.status = 401;
                 }
+            } catch (const std::exception& e) {
+                res.set_content("Invalid request format!", "text/plain");
+                res.status = 400;
+            }
+        });
+
+        http_server.Post("/register", [this](const httplib::Request& req, httplib::Response& res) {
+            try {
+                nlohmann::json request_body = nlohmann::json::parse(req.body);
+                std::string username = request_body["username"];
+                std::string password = request_body["password"];
+
+                User user{0, username, password};
+                db->addUser(user);
+
+                res.set_content("User registered successfully!", "text/plain");
             } catch (const std::exception& e) {
                 res.set_content("Invalid request format!", "text/plain");
                 res.status = 400;
