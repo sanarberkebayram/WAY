@@ -11,7 +11,18 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 include_directories(include extern/cpp-httplib extern/sqlite_orm/include)
 
 # Add library for the framework
-add_library(way_framework src/server.cpp src/PasswordStrategy.cpp src/JwtStrategy.cpp src/GoogleOAuth2Strategy.cpp src/AuthenticationService.cpp src/SQLiteDatabase.cpp src/DatabaseFactory.cpp src/InMemorySessionManager.cpp src/RateLimiter.cpp)
+add_library(way_framework 
+    src/server.cpp 
+    src/PasswordStrategy.cpp 
+    src/JwtStrategy.cpp 
+    src/GoogleOAuth2Strategy.cpp 
+    src/AuthenticationService.cpp 
+    src/SQLiteDatabase.cpp 
+    src/DatabaseFactory.cpp 
+    src/InMemorySessionManager.cpp 
+    src/RateLimiter.cpp
+    src/ConfigManager.cpp
+)
 
 # Add jwt-cpp library
 add_subdirectory(extern/jwt-cpp)
@@ -26,7 +37,7 @@ add_executable(way_server src/main.cpp)
 target_link_libraries(way_server way_framework)
 
 # Add CLI executable
-add_executable(way_cli cli/main.cpp)
+add_executable(way_cli src/cli/main.cpp)
 
 # Link CLI executable to the framework
 target_link_libraries(way_cli way_framework)
@@ -35,7 +46,7 @@ target_link_libraries(way_cli way_framework)
 enable_testing()
 
 # Add test executable
-add_executable(way_tests tests/test_framework.cpp)
+add_executable(way_tests src/tests/test_framework.cpp)
 
 # Link test executable to the framework
 target_link_libraries(way_tests way_framework)

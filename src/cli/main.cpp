@@ -5,18 +5,16 @@
 #include "WAY/server.hpp"
 #include "WAY/DatabaseFactory.hpp"
 #include "WAY/InMemorySessionManager.hpp"
-
-// Function to get environment variable or default value
-std::string get_env_var(const std::string& var_name, const std::string& default_value) {
-    const char* value = std::getenv(var_name.c_str());
-    return value ? value : default_value;
-}
+#include "WAY/ConfigManager.hpp"
 
 int main(int argc, char* argv[]) {
+    WAY::ConfigManager config_manager;
+    config_manager.loadConfig("config.json"); // Load from file, if exists
+
     // Parse command line arguments (basic example)
-    int port = 8080;
-    std::string db_type = "sqlite";
-    std::string db_path = "way.db";
+    int port = config_manager.getInt("port", 8080);
+    std::string db_type = config_manager.getString("db_type", "sqlite");
+    std::string db_path = config_manager.getString("db_path", "way.db");
 
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
@@ -35,11 +33,6 @@ int main(int argc, char* argv[]) {
             return 0;
         }
     }
-
-    // Override with environment variables if set
-    port = std::stoi(get_env_var("WAY_PORT", std::to_string(port)));
-    db_type = get_env_var("WAY_DB_TYPE", db_type);
-    db_path = get_env_var("WAY_DB_PATH", db_path);
 
     std::map<std::string, std::string> db_config;
     if (db_type == "sqlite") {

@@ -142,7 +142,7 @@ Here are some of the features and improvements planned for the future of WAY:
 
 -   **Improved Developer Experience:**
     -   [x] **Command-Line Interface (CLI):** Developed a CLI tool to manage the server, including starting/stopping the server and managing configuration through environment variables.
-    -   [ ] **Configuration Management:** Implement a more robust configuration system to manage secrets and other settings.
+    -   [x] **Configuration Management:** Implemented a robust configuration system that reads from `config.json` and environment variables, with environment variables taking precedence.
 
 -   **Expanded Authentication Strategies:**
     -   [ ] **OpenID Connect:** Add support for OpenID Connect, building on the existing OAuth 2.0 implementation.
